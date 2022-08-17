@@ -10,11 +10,13 @@ namespace if_risk
     {
         private string _name;
         private IList<Risk> _availableRisks;
+        private IList<Policy> _allPolicies;
 
         public InsuranceCompany(string name, IList<Risk> availableRisks)
         {
             _name = name;
             _availableRisks = availableRisks;
+            _allPolicies = new List<Policy>();
         }
 
         public string Name {
@@ -29,7 +31,10 @@ namespace if_risk
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
-            return new Policy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
+            var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
+            _allPolicies.Add(Policy);
+
+            return Policy;
         }
 
         public void AddRisk(string nameOfInsuredObject, Risk risk, DateTime validFrom)
