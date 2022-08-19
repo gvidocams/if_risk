@@ -31,6 +31,24 @@ namespace if_risk
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
+            if(validFrom < DateTime.Today)
+            {
+                throw new Exception("Can't sell a policy in the past!");
+            }
+
+            var validTill = validFrom.AddMonths(validMonths);
+
+            foreach(var policy in _allPolicies)
+            {
+                if(policy.NameOfInsuredObject == nameOfInsuredObject)
+                {
+                    if((validFrom >= policy.ValidFrom && validFrom <= policy.ValidTill) || (validTill >= policy.ValidFrom && validTill <= policy.ValidTill))
+                    {
+                        throw new Exception("Can't sell an already existing policy!");
+                    }
+                }
+            }
+
             var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
             _allPolicies.Add(Policy);
 

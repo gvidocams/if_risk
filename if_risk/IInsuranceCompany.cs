@@ -8,13 +8,8 @@ namespace if_risk
 {
     public interface IInsuranceCompany
     {
-        /// <summary>
-        /// Name of Insurance company
-        /// </summary>
         string Name { get; }
-        /// <summary>
-        /// List of the risks that can be insured. List can be updated at any time
-        /// </summary>
+
         IList<Risk> AvailableRisks { get; set; }
         /// <summary>
         /// Sell the policy.

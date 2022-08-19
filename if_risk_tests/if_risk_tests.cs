@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using if_risk;
+using FluentAssertions;
 
 namespace IfRiskTests
 {
@@ -107,17 +108,40 @@ namespace IfRiskTests
             };
             var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
 
-            var policyListOfRisks = Policy.InsuredRisks;
+            var actual = Policy.InsuredRisks;
 
-            Assert.AreEqual(listOfRisks, policyListOfRisks);
+            Assert.AreEqual(listOfRisks, actual);
+        }
+
+        [TestMethod]
+        public void Policy_Get_Premium()
+        {
+            var nameOfInsuredObject = "Car";
+            var validFrom = new DateTime(2022, 8, 25);
+            var validMonths = (short)8;
+            var listOfRisks = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400)
+            };
+            var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+
+            var actual = Policy.Premium;
+            var expected = 500;
+
+            Assert.AreEqual(expected, actual);
         }
     }
     
     [TestClass]
-    public class InsuranceCompanyTests
+    public class InsuranceCompanyTests 
     {
-        [TestMethod]
-        public void InsuranceCompany_Get_Name()
+        private IInsuranceCompany _insuranceCompany;
+        private List<Risk> _listOfRisks;
+
+        [TestInitialize]
+        public void Setup()
         {
             var insuranceCompanyName = "If";
             var listOfRisks = new List<Risk>
@@ -126,47 +150,214 @@ namespace IfRiskTests
                 new Risk("Weather", 150),
                 new Risk("Personal", 400)
             };
-            var InsuranceCompany = new InsuranceCompany(insuranceCompanyName, listOfRisks);
 
-            var actual = InsuranceCompany.Name;
+            _insuranceCompany = new InsuranceCompany(insuranceCompanyName, listOfRisks);
+            _listOfRisks = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400)
+            };
+        }
 
-            Assert.AreEqual(insuranceCompanyName, actual);
+        [TestMethod]
+        public void InsuranceCompany_Get_Name()
+        {
+            _insuranceCompany.Name.Should().Be("If");
         }
 
         [TestMethod]
         public void InsuranceCompany_Get_AvailableRisks()
         {
-            var insuranceCompanyName = "If";
-            var listOfRisks = new List<Risk>
+            for(int i = 0; i < _listOfRisks.Count; i++)
             {
-                new Risk("Theft", 200),
-                new Risk("Weather", 150),
-                new Risk("Personal", 400)
-            };
-            var InsuranceCompany = new InsuranceCompany(insuranceCompanyName, listOfRisks);
+                var expected = _listOfRisks[i].Name;
+                var actual = _insuranceCompany.AvailableRisks[i].Name;
+                Assert.AreEqual(expected, actual);
+            }
 
-            var actual = InsuranceCompany.AvailableRisks;
+            for (int i = 0; i < _listOfRisks.Count; i++)
+            {
+                var expected = _listOfRisks[i].YearlyPrice;
+                var actual = _insuranceCompany.AvailableRisks[i].YearlyPrice;
+                Assert.AreEqual(expected, actual);
+            }
 
-            Assert.AreEqual(listOfRisks, actual);
+            Assert.AreEqual(_listOfRisks.Count, _insuranceCompany.AvailableRisks.Count);
         }
-
+       
         [TestMethod]
         public void InsuranceCompany_Set_AvailableRisks()
         {
-            var insuranceCompanyName = "If";
+            var expected = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400),
+                new Risk("Financial", 2000)
+            };
+
+            _insuranceCompany.AvailableRisks = expected;
+            var actual = _insuranceCompany.AvailableRisks;
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void InsuranceCompany_SellPolicy_Catch_Invalid_ValidFrom()
+        {
             var listOfRisks = new List<Risk>
             {
                 new Risk("Theft", 200),
                 new Risk("Weather", 150),
                 new Risk("Personal", 400)
             };
-            var InsuranceCompany = new InsuranceCompany(insuranceCompanyName, listOfRisks);
 
-            listOfRisks.Add(new Risk("Financial", 2000));
-            InsuranceCompany.AvailableRisks = listOfRisks;
-            var actual = InsuranceCompany.AvailableRisks;
+            var nameOfInsuredObject = "Rock";
+            var validFrom = new DateTime(2002, 8, 26);
+            var validMonths = (short)4;
 
-            Assert.AreEqual(listOfRisks, actual);
+            Exception expected = null;
+
+            try
+            {
+                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+            }
+            catch (Exception ex)
+            {
+                expected = ex;
+            }
+
+            Assert.IsNotNull(expected);
         }
+
+        [TestMethod]
+        public void InsuranceCompany_SellPolicy_Catch_AlreadyExistingPolicy_ValidFrom()
+        {
+            var listOfRisks = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400)
+            };
+
+            var nameOfInsuredObject = "Rock";
+            var validFrom = new DateTime(2023, 12, 26);
+            var validMonths = (short)4;
+
+            _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+
+            validFrom = new DateTime(2024, 1, 26);
+            validMonths = (short)2;
+
+            Exception expected = null;
+
+            try
+            {
+                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+            }
+            catch (Exception ex)
+            {
+                expected = ex;
+            }
+
+            Assert.IsNotNull(expected);
+        }
+
+        [TestMethod]
+        public void InsuranceCompany_SellPolicy_Catch_AlreadyExistingPolicy_ValidTill()
+        {
+            var listOfRisks = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400)
+            };
+
+            var nameOfInsuredObject = "Rock";
+            var validFrom = new DateTime(2023, 12, 26);
+            var validMonths = (short)4;
+
+            _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+
+            validFrom = new DateTime(2023, 10, 26);
+
+            Exception expected = null;
+
+            try
+            {
+                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+            }
+            catch (Exception ex)
+            {
+                expected = ex;
+            }
+
+            Assert.IsNotNull(expected);
+        }
+
+        [TestMethod]
+        public void InsuranceCompany_SellPolicy_Catch_AlreadyExistingPolicy_Identical()
+        {
+            var listOfRisks = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400)
+            };
+
+            var nameOfInsuredObject = "Rock";
+            var validFrom = new DateTime(2023, 12, 26);
+            var validMonths = (short)4;
+
+            _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+
+            Exception expected = null;
+
+            try
+            {
+                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+            }
+            catch (Exception ex)
+            {
+                expected = ex;
+            }
+
+            Assert.IsNotNull(expected);
+        }
+
+        [TestMethod]
+        public void InsuranceCompany_SellPolicy_SellTwoValidPolicies_IdenticalObjectToInsure()
+        {
+            var listOfRisks = new List<Risk>
+            {
+                new Risk("Theft", 200),
+                new Risk("Weather", 150),
+                new Risk("Personal", 400)
+            };
+
+            var nameOfInsuredObject = "Rock";
+            var validFrom = new DateTime(2024, 1, 1);
+            var validMonths = (short)4;
+
+            _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+
+            validFrom = new DateTime(2024, 6, 1);
+
+            Exception expected = null;
+
+            try
+            {
+                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
+            }
+            catch(Exception ex)
+            {
+                expected = ex;
+            }
+
+            Assert.IsNull(expected);
+        }
+
+
     }
 }

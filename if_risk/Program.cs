@@ -18,34 +18,11 @@ namespace if_risk
 
             var InsuranceCompany = new InsuranceCompany("If", listOfRisks);
 
-            var date = GetValidDate();
-            Console.WriteLine(date.AddMonths(3));
+            var exception = new Exception("Hello");
+            var exception2 = "Hello";
+
+            Console.WriteLine(exception.Message == exception2);
         }
 
-        static DateTime GetValidDate()
-        {
-            while (true)
-            {
-                Console.Write("Enter the year: ");
-                var year = Convert.ToInt32(Console.ReadLine());
-
-                Console.Write("Enter the month: ");
-                var month = Convert.ToInt32(Console.ReadLine());
-
-                Console.Write("Enter the day: ");
-                var day = Convert.ToInt32(Console.ReadLine());
-
-                try
-                {
-                    return new DateTime(year, month, day);
-                }
-                catch
-                {
-                    Console.Clear();
-                    Console.WriteLine("Not a valid date\n");
-                }
-            }
-            
-        }
     }
 }
