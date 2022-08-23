@@ -43,6 +43,7 @@ namespace if_risk
         public decimal Premium
         {
             get => _premium;
+            set => _premium = value;
         }
 
         public IList<Risk> InsuredRisks 
@@ -52,6 +53,10 @@ namespace if_risk
 
         private decimal CalculatePremium()
         {
+            int daysInThisYear = DateTime.IsLeapYear(_validFrom.Year) ? 366 : 365;
+
+            int validPolicyDays = (_validTill - _validFrom).Days;
+
             decimal premiumSum = 0;
 
             foreach(Risk risk in _insuredRisks)
@@ -59,8 +64,8 @@ namespace if_risk
                 premiumSum += risk.YearlyPrice;
             }
 
-            decimal policyPricePerMonth = premiumSum / 12;
-            decimal policyPrice = policyPricePerMonth * _validMonths;
+            decimal policyPricePerDay = premiumSum / daysInThisYear;
+            decimal policyPrice = policyPricePerDay * validPolicyDays;
 
             return Math.Round(policyPrice, 2);
         }
