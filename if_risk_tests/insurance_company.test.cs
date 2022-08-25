@@ -20,17 +20,17 @@ namespace IfRiskTests
                 new Risk("Personal", 400)
             };
 
-            _insuranceCompany = new InsuranceCompany("If", _availableListOfRisks);
+            _insuranceCompany = new InsuranceCompany("If", _availableListOfRisks, new List<Policy>());
         }
 
         [TestMethod]
-        public void InsuranceCompany_Get_Name()
+        public void Get_Name_Returns_InsuranceCompany_Name()
         {
             _insuranceCompany.Name.Should().Be("If");
         }
 
         [TestMethod]
-        public void InsuranceCompany_Get_AvailableRisks()
+        public void Get_AvailableRisks_Returns_AvailableRisks()
         {
             var expected = _availableListOfRisks;
 
@@ -40,7 +40,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void InsuranceCompany_Set_AvailableRisks()
+        public void Set_AvailableRisks_Return_New_AvailableRisks()
         {
             var expected = new List<Risk>
             {
@@ -58,9 +58,8 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void InsuranceCompany_SellPolicy_Catch_Invalid_ValidFrom()
+        public void SellPolicy_SellAPolicyInThePast_Throws_InvalidPolicyStartDateException()
         {
-       
             var listOfRisks = new List<Risk>
             {
                 new Risk("Theft", 200),
@@ -72,22 +71,11 @@ namespace IfRiskTests
             var validFrom = new DateTime(2002, 8, 26);
             var validMonths = (short)4;
 
-            Exception expected = null;
-
-            try
-            {
-                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            Assert.ThrowsException<InvalidPolicyStartDateException>(() => _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks));
         }
 
         [TestMethod]
-        public void InsuranceCompany_SellPolicy_Catch_AlreadyExistingPolicy_ValidFrom()
+        public void SellPolicy_SellAValidPolicyAndSellADuplicatePolicy_Throws_DuplicatePolicyException_ValidFromFails()
         {
             var listOfRisks = new List<Risk>
             {
@@ -105,22 +93,11 @@ namespace IfRiskTests
             validFrom = new DateTime(2024, 1, 26);
             validMonths = (short)2;
 
-            Exception expected = null;
-
-            try
-            {
-                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            Assert.ThrowsException<DuplicatePolicyException>(() => _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks));
         }
 
         [TestMethod]
-        public void InsuranceCompany_SellPolicy_Catch_AlreadyExistingPolicy_ValidTill()
+        public void SellPolicy_SellAValidPolicyAndSellADuplicatePolicy_Throw_DuplicatePolicyException_ValidTillFails()
         {
             var listOfRisks = new List<Risk>
             {
@@ -136,23 +113,12 @@ namespace IfRiskTests
             _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
 
             validFrom = new DateTime(2023, 10, 26);
-
-            Exception expected = null;
-
-            try
-            {
-                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            
+            Assert.ThrowsException<DuplicatePolicyException>(() => _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks));
         }
 
         [TestMethod]
-        public void InsuranceCompany_SellPolicy_Catch_AlreadyExistingPolicy_Identical()
+        public void SellPolicy_SellTwoIdenticalPolicies_Throws_DuplicatePolicyException()
         {
             var listOfRisks = new List<Risk>
             {
@@ -167,22 +133,11 @@ namespace IfRiskTests
 
             _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
 
-            Exception expected = null;
-
-            try
-            {
-                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            Assert.ThrowsException<DuplicatePolicyException>(() => _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks));
         }
 
         [TestMethod]
-        public void InsuranceCompany_SellPolicy_SellTwoValidPolicies_IdenticalObjectToInsure()
+        public void SellPolicy_SellTwoValidPolicies_Returns_LengthOf_AllPoliciesList_Equals_2()
         {
             var listOfRisks = new List<Risk>
             {
@@ -199,22 +154,16 @@ namespace IfRiskTests
 
             validFrom = new DateTime(2024, 6, 1);
 
-            Exception expected = null;
+            _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
 
-            try
-            {
-                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
+            int expected = 2;
+            int actual = _insuranceCompany.AllPolicies.Count;
 
-            Assert.IsNull(expected);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void InsuranceCompany_SellPolicy_Catch_NotValidSelectedRisk()
+        public void SellPolicy_SellAPolicy_WithARisk_NotIncludedIn_AvailaleRisks_Throws_NotValidSelectedRisk()
         {
             var listOfRisks = new List<Risk>
             {
@@ -230,20 +179,13 @@ namespace IfRiskTests
 
             Exception expected = null;
 
-            try
-            {
-                _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            
+            Assert.ThrowsException<InvalidRiskException>(() => _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks));
+            
         }
 
         [TestMethod]
-        public void InsuranceCompany_AddRisk_AddRiskToAValidObject_BeforeItHasBecomeActive()
+        public void AddRisk_AddRiskToAValidObject_BeforeItHasBecomeActive()
         {
             var nameOfInsuredObject = "Rock";
             var validFrom = new DateTime(2023, 1, 1);
@@ -269,28 +211,17 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void InsuranceCompany_AddRisk_Catch_ExceptionIfTheObjectToInsureDoesntExist()
+        public void AddRisk_AddsARiskToANonExistantObject_Throws_ExceptionIfTheObjectToInsureDoesntExist()
         {
             var nameOfInsuredObject = "Rock";
             var validFrom = new DateTime(2023, 1, 1);
             var Risk = new Risk("Global events", 300);
 
-            Exception expected = null;
-
-            try
-            {
-                _insuranceCompany.AddRisk(nameOfInsuredObject, Risk, validFrom);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            Assert.ThrowsException<PolicyNotFoundException>(() => _insuranceCompany.AddRisk(nameOfInsuredObject, Risk, validFrom));
         }
 
         [TestMethod]
-        public void InsuranceCompany_AddRisk_AddRiskToAValidObject_AddPremium()
+        public void AddRisk_AddsARiskToAValidObject_Returns_PreviousPremiumAndNewlyCalculatedPremium()
         {
             var nameOfInsuredObject = "Rock";
             var validFrom = new DateTime(2023, 1, 1);
@@ -315,7 +246,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void InsuranceCompany_AddRisk_Catch_RiskValidFrom_InThePast()
+        public void AddRisk_AddsARiskToAValidObject_Throws_InvalidRiskException_Invalid_ValidFrom()
         {
             var nameOfInsuredObject = "Rock";
             var validFrom = new DateTime(2023, 1, 1);
@@ -332,22 +263,11 @@ namespace IfRiskTests
             var Risk = new Risk("Global events", 300);
             var riskValidFrom = new DateTime(2002, 8, 26);
 
-            Exception expected = null;
-
-            try
-            {
-                _insuranceCompany.AddRisk(nameOfInsuredObject, Risk, riskValidFrom);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            Assert.ThrowsException<InvalidRiskException>(() => _insuranceCompany.AddRisk(nameOfInsuredObject, Risk, riskValidFrom));
         }
 
         [TestMethod]
-        public void InsuranceCompany_GetPolicy_GetValidPolicy()
+        public void GetPolicy_GetValidPolicy()
         {
             var nameOfInsuredObject = "Rock";
             var validFrom = new DateTime(2023, 1, 1);
@@ -376,23 +296,14 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void InsuranceCompany_GetPolicy_Catch_NotExistingPolicy()
+        public void GetPolicy_GetANonExistantPolicy_Throws_NotExistingPolicy()
         {
             var nameOfInsuredObject = "Rock";
             var effectiveDate = new DateTime(2023, 1, 5);
 
             Exception expected = null;
 
-            try
-            {
-                var policy = _insuranceCompany.GetPolicy(nameOfInsuredObject, effectiveDate);
-            }
-            catch (Exception ex)
-            {
-                expected = ex;
-            }
-
-            Assert.IsNotNull(expected);
+            Assert.ThrowsException<PolicyNotFoundException>(() => _insuranceCompany.GetPolicy(nameOfInsuredObject, effectiveDate));
         }
     }
 }

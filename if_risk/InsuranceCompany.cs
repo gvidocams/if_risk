@@ -10,25 +10,20 @@ namespace if_risk
     {
         public string Name { get; }
         public IList<Risk> AvailableRisks { get; set; }
-        private IList<Policy> AllPolicies;
+        public IList<Policy> AllPolicies { get; }
 
-        public InsuranceCompany(string name, IList<Risk> availableRisks)
+        public InsuranceCompany(string name, IList<Risk> availableRisks, IList<Policy> allPolicies)
         {
             Name = name;
             AvailableRisks = availableRisks;
-            AllPolicies = new List<Policy>();
-        }
-
-        public IList<Policy> AllPolicies
-        {
-            get => AllPolicies;
+            AllPolicies = allPolicies;
         }
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
             if(validFrom < DateTime.Today)
             {
-                throw new Exception("Can't sell a policy in the past!");
+                throw new InvalidPolicyStartDateException("Can't sell a policy in the past!");
             }
 
             foreach (var selectedRisk in selectedRisks)
@@ -46,7 +41,7 @@ namespace if_risk
 
                 if(!isAValidRiskToInsure)
                 {
-                    throw new Exception("This insurance company doesn't insure this risk!");
+                    throw new InvalidRiskException("This insurance company doesn't insure this risk!");
                 }
             }
 
@@ -61,7 +56,7 @@ namespace if_risk
 
                     if (isNotAUniqueValidFrom || isNotAUniqueValidTill)
                     {
-                        throw new Exception("Can't sell an already existing policy!");
+                        throw new DuplicatePolicyException("Can't sell an already existing policy!");
                     }
                 }
             }
@@ -76,7 +71,7 @@ namespace if_risk
         {
             if (validFrom < DateTime.Today)
             {
-                throw new Exception("Can't add a risk which is set to be valid in the past!");
+                throw new InvalidRiskException("Can't add a risk which is set to be valid in the past!");
             }
 
             foreach(Policy policy in AllPolicies)
@@ -90,7 +85,7 @@ namespace if_risk
                 }
             }
 
-            throw new Exception("This object doesn't exist!");
+            throw new PolicyNotFoundException("This object doesn't exist!");
         }
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
@@ -106,7 +101,7 @@ namespace if_risk
                 }
             }
 
-            throw new Exception("No policy found with this date!");
+            throw new PolicyNotFoundException("No policy found with this date!");
         }
 
         private decimal AddNewlyAddedRiskPremium(Risk Risk, DateTime validFrom, DateTime validTill)
