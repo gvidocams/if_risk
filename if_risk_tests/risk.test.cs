@@ -16,7 +16,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void GetRiskName()
+        public void Get_RiskName_Returns_RiskName()
         {
             var expected = "Weather hazards";
 
@@ -26,7 +26,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void GetRiskYearlyPrice()
+        public void Get_RiskYearlyPrice_Returns_RiskYearlyPrice()
         {
             var expected = 200;
 
