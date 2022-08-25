@@ -23,7 +23,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void Policy_Get_NameOfInsuredObject()
+        public void Get_NameOfInsuredObject_Returns_NameOfInsuredObject()
         {
             var expected = "Car";
 
@@ -33,7 +33,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void Policy_Get_ValidFrom()
+        public void Get_ValidFrom_Returns_ValidFrom()
         {
             var expected = new DateTime(2022, 8, 25);
 
@@ -43,7 +43,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void Policy_Get_ValidTill()
+        public void Get_ValidTill_Returns_ValidTill()
         {
             var expected = new DateTime(2023, 4, 25);
 
@@ -53,7 +53,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void Policy_Get_ListOfInsuredRisks()
+        public void Get_ListOfInsuredRisks_Returns_ListOfInsuredRisks()
         {
             var expected = _listOfRisks;
 
@@ -63,7 +63,7 @@ namespace IfRiskTests
         }
 
         [TestMethod]
-        public void Policy_Get_Premium()
+        public void Get_Premium_ReturnsPremium()
         {
             var actual = _policy.Premium;
 
