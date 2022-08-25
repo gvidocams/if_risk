@@ -8,30 +8,20 @@ namespace if_risk
 {
     public class InsuranceCompany : IInsuranceCompany
     {
-        private string _name;
-        private IList<Risk> _availableRisks;
-        private IList<Policy> _allPolicies;
+        public string Name { get; }
+        public IList<Risk> AvailableRisks { get; set; }
+        private IList<Policy> AllPolicies;
 
         public InsuranceCompany(string name, IList<Risk> availableRisks)
         {
-            _name = name;
-            _availableRisks = availableRisks;
-            _allPolicies = new List<Policy>();
-        }
-
-        public string Name {
-            get => _name;
-        }
-
-        public IList<Risk> AvailableRisks
-        {
-            get => _availableRisks;
-            set => _availableRisks = value;
+            Name = name;
+            AvailableRisks = availableRisks;
+            AllPolicies = new List<Policy>();
         }
 
         public IList<Policy> AllPolicies
         {
-            get => _allPolicies;
+            get => AllPolicies;
         }
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
@@ -45,7 +35,7 @@ namespace if_risk
             {
                 bool isAValidRiskToInsure = false;
 
-                foreach (var availableRisk in _availableRisks)
+                foreach (var availableRisk in AvailableRisks)
                 {
                     if (selectedRisk.Name == availableRisk.Name)
                     {
@@ -62,7 +52,7 @@ namespace if_risk
 
             var validTill = validFrom.AddMonths(validMonths);
 
-            foreach(var policy in _allPolicies)
+            foreach(var policy in AllPolicies)
             {
                 if(policy.NameOfInsuredObject == nameOfInsuredObject)
                 {
@@ -77,7 +67,7 @@ namespace if_risk
             }
 
             var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
-            _allPolicies.Add(Policy);
+            AllPolicies.Add(Policy);
 
             return Policy;
         }
@@ -89,7 +79,7 @@ namespace if_risk
                 throw new Exception("Can't add a risk which is set to be valid in the past!");
             }
 
-            foreach(Policy policy in _allPolicies)
+            foreach(Policy policy in AllPolicies)
             {
                 if(policy.NameOfInsuredObject == nameOfInsuredObject)
                 {
@@ -105,7 +95,7 @@ namespace if_risk
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
         {
-            foreach(Policy policy in _allPolicies)
+            foreach(Policy policy in AllPolicies)
             {
                 if(nameOfInsuredObject == policy.NameOfInsuredObject)
                 {

@@ -8,24 +8,13 @@ namespace if_risk
 {
     public class Risk
     {
-        public string name;
-        public decimal yearlyPrice;
+        public string Name { get; set; }
+        public decimal YearlyPrice { get; set; }
 
         public Risk(string name, decimal yearlyPrice)
         {
-            this.name = name;
-            this.yearlyPrice = yearlyPrice;
-        }
-
-        public string Name 
-        { 
-            get => name; 
-            set => name = value; 
-        }
-
-        public decimal YearlyPrice { 
-            get => yearlyPrice;
-            set => yearlyPrice = value; 
+            this.Name = name;
+            this.YearlyPrice = yearlyPrice;
         }
     }
 }

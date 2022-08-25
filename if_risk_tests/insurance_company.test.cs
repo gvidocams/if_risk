@@ -1,120 +1,11 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using if_risk;
 using FluentAssertions;
 
 namespace IfRiskTests
 {
     [TestClass]
-    public class RiskTests
-    {
-        private Risk _risk;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var riskName = "Weather hazards";
-            var riskPrice = 200;
-
-            _risk = new Risk(riskName, riskPrice);
-        }
-
-        [TestMethod]
-        public void GetRiskName()
-        {
-            var expected = "Weather hazards";
-
-            var actual = _risk.Name;
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void GetRiskYearlyPrice()
-        {
-            var expected = 200;
-
-            var actual = _risk.YearlyPrice;
-
-            Assert.AreEqual(expected, actual);
-        }
-    }
-
-    [TestClass]
-    public class PolicyTests
-    {
-        private IPolicy _policy;
-        private List<Risk> _listOfRisks;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            var nameOfInsuredObject = "Car";
-            var validFrom = new DateTime(2022, 8, 25);
-            var validMonths = (short)8;
-            var listOfRisks = new List<Risk>
-            {
-                new Risk("Theft", 200),
-                new Risk("Weather", 150),
-                new Risk("Personal", 400)
-            };
-            _listOfRisks = listOfRisks;
-            _policy = new Policy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
-
-        }
-
-        [TestMethod]
-        public void Policy_Get_NameOfInsuredObject()
-        {
-            var expected = "Car";
-
-            var actual = _policy.NameOfInsuredObject;
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void Policy_Get_ValidFrom()
-        {
-            var expected = new DateTime(2022, 8, 25);
-            
-            var actual = _policy.ValidFrom;
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void Policy_Get_ValidTill()
-        {
-            var expected = new DateTime(2023, 4, 25);
-
-            var actual = _policy.ValidTill;
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void Policy_Get_ListOfInsuredRisks()
-        {
-            var expected = _listOfRisks;
-
-            var actual = _policy.InsuredRisks;
-            
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void Policy_Get_Premium()
-        {
-            var actual = _policy.Premium;
-
-            decimal expected = (decimal)499.32;
-
-            Assert.AreEqual(expected, actual);
-        }
-    }
-    
-    [TestClass]
-    public class InsuranceCompanyTests 
+    public class InsuranceCompanyTests
     {
         private IInsuranceCompany _insuranceCompany;
         private List<Risk> _availableListOfRisks;
@@ -122,7 +13,6 @@ namespace IfRiskTests
         [TestInitialize]
         public void Setup()
         {
-            var insuranceCompanyName = "If";
             _availableListOfRisks = new List<Risk>
             {
                 new Risk("Theft", 200),
@@ -130,7 +20,7 @@ namespace IfRiskTests
                 new Risk("Personal", 400)
             };
 
-            _insuranceCompany = new InsuranceCompany(insuranceCompanyName, _availableListOfRisks);
+            _insuranceCompany = new InsuranceCompany("If", _availableListOfRisks);
         }
 
         [TestMethod]
@@ -148,7 +38,7 @@ namespace IfRiskTests
 
             Assert.AreEqual(expected, actual);
         }
-       
+
         [TestMethod]
         public void InsuranceCompany_Set_AvailableRisks()
         {
@@ -170,6 +60,7 @@ namespace IfRiskTests
         [TestMethod]
         public void InsuranceCompany_SellPolicy_Catch_Invalid_ValidFrom()
         {
+       
             var listOfRisks = new List<Risk>
             {
                 new Risk("Theft", 200),
@@ -314,7 +205,7 @@ namespace IfRiskTests
             {
                 _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 expected = ex;
             }
@@ -343,7 +234,7 @@ namespace IfRiskTests
             {
                 _insuranceCompany.SellPolicy(nameOfInsuredObject, validFrom, validMonths, listOfRisks);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 expected = ex;
             }
@@ -390,7 +281,7 @@ namespace IfRiskTests
             {
                 _insuranceCompany.AddRisk(nameOfInsuredObject, Risk, validFrom);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 expected = ex;
             }
@@ -447,7 +338,7 @@ namespace IfRiskTests
             {
                 _insuranceCompany.AddRisk(nameOfInsuredObject, Risk, riskValidFrom);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 expected = ex;
             }
@@ -496,7 +387,7 @@ namespace IfRiskTests
             {
                 var policy = _insuranceCompany.GetPolicy(nameOfInsuredObject, effectiveDate);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 expected = ex;
             }

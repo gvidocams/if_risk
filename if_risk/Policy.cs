@@ -8,58 +8,30 @@ namespace if_risk
 {
     public class Policy : IPolicy
     {
-        private string _nameOfInsuredObject;
-        private DateTime _validFrom;
-        private DateTime _validTill;
-        private short _validMonths;
-        private decimal _premium;
-        private IList<Risk> _insuredRisks;
+        public string NameOfInsuredObject { get; }
+        public DateTime ValidFrom { get; }
+        public DateTime ValidTill { get; }
+        public decimal Premium { get; set; }
+        public IList<Risk> InsuredRisks { get; }
 
         public Policy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> insuredRisks)
         {
-            _nameOfInsuredObject = nameOfInsuredObject;
-            _validFrom = validFrom;
-            _validMonths = validMonths;
-            _validTill = validFrom.AddMonths(validMonths); 
-            _insuredRisks = insuredRisks;
-            _premium = CalculatePremium();
-        }
-
-        public string NameOfInsuredObject
-        {
-            get => _nameOfInsuredObject;
-        }
-
-        public DateTime ValidFrom
-        {
-            get => _validFrom;
-        }
-
-        public DateTime ValidTill
-        {
-            get => _validTill;
-        }
-
-        public decimal Premium
-        {
-            get => _premium;
-            set => _premium = value;
-        }
-
-        public IList<Risk> InsuredRisks 
-        {
-            get => _insuredRisks;
+            NameOfInsuredObject = nameOfInsuredObject;
+            ValidFrom = validFrom;
+            ValidTill = validFrom.AddMonths(validMonths); 
+            InsuredRisks = insuredRisks;
+            Premium = CalculatePremium();
         }
 
         private decimal CalculatePremium()
         {
-            int daysInThisYear = DateTime.IsLeapYear(_validFrom.Year) ? 366 : 365;
+            int daysInThisYear = DateTime.IsLeapYear(ValidFrom.Year) ? 366 : 365;
 
-            int validPolicyDays = (_validTill - _validFrom).Days;
+            int validPolicyDays = (ValidTill - ValidFrom).Days;
 
             decimal premiumSum = 0;
 
-            foreach(Risk risk in _insuredRisks)
+            foreach(Risk risk in InsuredRisks)
             {
                 premiumSum += risk.YearlyPrice;
             }
