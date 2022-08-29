@@ -1,11 +1,12 @@
-﻿namespace if_risk
+﻿using System;
+using System.Collections.Generic;
+
+namespace if_risk
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            
         }
-
     }
 }

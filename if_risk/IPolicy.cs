@@ -14,7 +14,7 @@ namespace if_risk
 
         DateTime ValidTill { get; }
 
-        decimal Premium { get; set; }
+        decimal Premium { get; }
 
         IList<Risk> InsuredRisks { get; }
     }

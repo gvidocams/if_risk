@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using if_risk;
 
 namespace if_risk
 {
@@ -11,8 +9,8 @@ namespace if_risk
         public string NameOfInsuredObject { get; }
         public DateTime ValidFrom { get; }
         public DateTime ValidTill { get; }
-        public decimal Premium { get; set; }
         public IList<Risk> InsuredRisks { get; }
+        public Dictionary<Risk, DateTime> RiskPeriods;
 
         public Policy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> insuredRisks)
         {
@@ -20,26 +18,12 @@ namespace if_risk
             ValidFrom = validFrom;
             ValidTill = validFrom.AddMonths(validMonths); 
             InsuredRisks = insuredRisks;
-            Premium = CalculatePremium();
+            RiskPeriods = Helpers.SetRiskPeriods(insuredRisks, validFrom);
         }
 
-        private decimal CalculatePremium()
+        public decimal Premium
         {
-            int daysInThisYear = DateTime.IsLeapYear(ValidFrom.Year) ? 366 : 365;
-
-            int validPolicyDays = (ValidTill - ValidFrom).Days;
-
-            decimal premiumSum = 0;
-
-            foreach(Risk risk in InsuredRisks)
-            {
-                premiumSum += risk.YearlyPrice;
-            }
-
-            decimal policyPricePerDay = premiumSum / daysInThisYear;
-            decimal policyPrice = policyPricePerDay * validPolicyDays;
-
-            return Math.Round(policyPrice, 2);
+            get => Helpers.CalculatePremium(RiskPeriods, ValidTill);
         }
     }
 }

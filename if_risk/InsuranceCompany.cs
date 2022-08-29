@@ -21,47 +21,16 @@ namespace if_risk
 
         public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
         {
-            if(validFrom < DateTime.Today)
-            {
-                throw new InvalidPolicyStartDateException("Can't sell a policy in the past!");
-            }
+            Helpers.IsValidFromInThePast(validFrom);
 
-            foreach (var selectedRisk in selectedRisks)
-            {
-                bool isAValidRiskToInsure = false;
-
-                foreach (var availableRisk in AvailableRisks)
-                {
-                    if (selectedRisk.Name == availableRisk.Name)
-                    {
-                        isAValidRiskToInsure = true;
-                        continue;
-                    }
-                }
-
-                if(!isAValidRiskToInsure)
-                {
-                    throw new InvalidRiskException("This insurance company doesn't insure this risk!");
-                }
-            }
-
+            Helpers.CheckIfRisksAreValid(selectedRisks, AvailableRisks);
+            
             var validTill = validFrom.AddMonths(validMonths);
 
-            foreach(var policy in AllPolicies)
-            {
-                if(policy.NameOfInsuredObject == nameOfInsuredObject)
-                {
-                    bool isNotAUniqueValidFrom = (validFrom >= policy.ValidFrom) && (validFrom <= policy.ValidTill);
-                    bool isNotAUniqueValidTill = (validTill >= policy.ValidFrom) && (validTill <= policy.ValidTill);
-
-                    if (isNotAUniqueValidFrom || isNotAUniqueValidTill)
-                    {
-                        throw new DuplicatePolicyException("Can't sell an already existing policy!");
-                    }
-                }
-            }
-
+            Helpers.IsAValidPolicyToInsure(nameOfInsuredObject, AllPolicies, validFrom, validTill);
+            
             var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
+
             AllPolicies.Add(Policy);
 
             return Policy;
@@ -69,18 +38,13 @@ namespace if_risk
 
         public void AddRisk(string nameOfInsuredObject, Risk Risk, DateTime validFrom)
         {
-            if (validFrom < DateTime.Today)
-            {
-                throw new InvalidRiskException("Can't add a risk which is set to be valid in the past!");
-            }
+            Helpers.IsValidFromInThePast(validFrom);
 
-            foreach(Policy policy in AllPolicies)
+            foreach (Policy policy in AllPolicies)
             {
                 if(policy.NameOfInsuredObject == nameOfInsuredObject)
                 {
-                    policy.InsuredRisks.Add(Risk);
-                    policy.Premium += AddNewlyAddedRiskPremium(Risk, validFrom, policy.ValidTill);
-
+                    policy.RiskPeriods.Add(Risk, validFrom);
                     return;
                 }
             }
@@ -102,17 +66,6 @@ namespace if_risk
             }
 
             throw new PolicyNotFoundException("No policy found with this date!");
-        }
-
-        private decimal AddNewlyAddedRiskPremium(Risk Risk, DateTime validFrom, DateTime validTill)
-        {
-            int daysInThisYear = DateTime.IsLeapYear(validFrom.Year) ? 366 : 365;
-
-            int validRiskDays = (validTill - validFrom).Days;
-
-            decimal premium = Math.Round(Risk.YearlyPrice / daysInThisYear * validRiskDays, 2);
-
-            return premium;
         }
     }
 }
