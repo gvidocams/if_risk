@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace if_risk
 {
@@ -24,11 +21,11 @@ namespace if_risk
             Helpers.IsValidFromInThePast(validFrom);
 
             Helpers.CheckIfRisksAreValid(selectedRisks, AvailableRisks);
-            
+
             var validTill = validFrom.AddMonths(validMonths);
 
             Helpers.IsAValidPolicyToInsure(nameOfInsuredObject, AllPolicies, validFrom, validTill);
-            
+
             var Policy = new Policy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
 
             AllPolicies.Add(Policy);
@@ -40,32 +37,20 @@ namespace if_risk
         {
             Helpers.IsValidFromInThePast(validFrom);
 
-            foreach (Policy policy in AllPolicies)
-            {
-                if(policy.NameOfInsuredObject == nameOfInsuredObject)
-                {
-                    policy.RiskPeriods.Add(Risk, validFrom);
-                    return;
-                }
-            }
-
-            throw new PolicyNotFoundException("This object doesn't exist!");
+            Helpers.FindPolicy(AllPolicies, nameOfInsuredObject).RiskPeriods.Add(Risk, validFrom);
         }
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
         {
-            foreach(Policy policy in AllPolicies)
+
+            var policy = Helpers.FindPolicy(AllPolicies, nameOfInsuredObject);
+
+            if (effectiveDate >= policy.ValidFrom && effectiveDate <= policy.ValidTill)
             {
-                if(nameOfInsuredObject == policy.NameOfInsuredObject)
-                {
-                    if(effectiveDate >= policy.ValidFrom && effectiveDate <= policy.ValidTill)
-                    {
-                        return policy;
-                    }
-                }
+                return policy;
             }
 
-            throw new PolicyNotFoundException("No policy found with this date!");
+            throw new InvalidDateException("Policy with the given date doesn't exist");
         }
     }
 }

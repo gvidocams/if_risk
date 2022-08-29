@@ -84,5 +84,18 @@ namespace if_risk
                 }
             }
         }
+
+        public static Policy FindPolicy(IList<Policy> listOfPolicies, string nameOfInsuredObject)
+        {
+            foreach (Policy policy in listOfPolicies)
+            {
+                if (policy.NameOfInsuredObject == nameOfInsuredObject)
+                {
+                    return policy;
+                }
+            }
+
+            throw new PolicyNotFoundException("This object doesn't exist!");
+        }
     }
 }
