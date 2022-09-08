@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace if_risk
 {
@@ -49,7 +47,7 @@ namespace if_risk
 
                     if (isNotAUniqueValidFrom || isNotAUniqueValidTill)
                     {
-                        throw new DuplicatePolicyException("Can't sell an already existing policy!");
+                        throw new DuplicatePolicyException();
                     }
                 }
             }
@@ -59,7 +57,7 @@ namespace if_risk
         {
             if (validFrom < DateTime.Today)
             {
-                throw new InvalidDateException("Valid from date can't be in the past!");
+                throw new InvalidDateException();
             }
         }
 
@@ -80,22 +78,21 @@ namespace if_risk
 
                 if (!isAValidRiskToInsure)
                 {
-                    throw new InvalidRiskException("This insurance company doesn't insure this risk!");
+                    throw new InvalidRiskException();
                 }
             }
         }
 
         public static Policy FindPolicy(IList<Policy> listOfPolicies, string nameOfInsuredObject)
         {
-            foreach (Policy policy in listOfPolicies)
+            var policy = listOfPolicies.FirstOrDefault(p => p.NameOfInsuredObject == nameOfInsuredObject);
+
+            if(policy == null)
             {
-                if (policy.NameOfInsuredObject == nameOfInsuredObject)
-                {
-                    return policy;
-                }
+                throw new PolicyNotFoundException();
             }
 
-            throw new PolicyNotFoundException("This object doesn't exist!");
+            return policy;
         }
     }
 }

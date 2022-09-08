@@ -47,10 +47,10 @@
     <Compile Include="Exceptions\InvalidDateException.cs" />
     <Compile Include="Exceptions\PolicyNotFoundException.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="IInsuranceCompany.cs" />
+    <Compile Include="Interfaces\IInsuranceCompany.cs" />
     <Compile Include="InsuranceCompany.cs" />
     <Compile Include="Exceptions\InvalidRiskException.cs" />
-    <Compile Include="IPolicy.cs" />
+    <Compile Include="Interfaces\IPolicy.cs" />
     <Compile Include="Policy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

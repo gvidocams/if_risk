@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using if_risk;
 
 namespace if_risk
 {

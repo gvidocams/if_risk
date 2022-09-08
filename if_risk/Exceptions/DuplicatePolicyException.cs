@@ -3,5 +3,6 @@
 [Serializable]
 public class DuplicatePolicyException : Exception
 {
-    public DuplicatePolicyException(string message) { }
+    public DuplicatePolicyException()
+        : base("Can't sell an already existing policy!") { }
 }

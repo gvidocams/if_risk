@@ -3,6 +3,7 @@
 [Serializable]
 public class InvalidDateException : Exception
 {
-    public InvalidDateException(string message){ }
+    public InvalidDateException()
+        : base("Can't set a date in the past!") { }
 }
 

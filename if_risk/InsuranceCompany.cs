@@ -42,7 +42,6 @@ namespace if_risk
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
         {
-
             var policy = Helpers.FindPolicy(AllPolicies, nameOfInsuredObject);
 
             if (effectiveDate >= policy.ValidFrom && effectiveDate <= policy.ValidTill)
@@ -50,7 +49,7 @@ namespace if_risk
                 return policy;
             }
 
-            throw new InvalidDateException("Policy with the given date doesn't exist");
+            throw new InvalidDateException();
         }
     }
 }
